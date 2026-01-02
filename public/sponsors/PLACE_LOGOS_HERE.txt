@@ -1,0 +1,18 @@
+PLACE YOUR SPONSOR LOGO FILES HERE
+
+Copy your sponsor logo image files into this directory.
+
+Recommended naming:
+- sponsor-company-name.png
+- sponsor-brand-name.png
+- sponsor-partner-name.png
+
+Examples:
+- sponsor-acme-corp.png
+- sponsor-firearms-supplier.png
+- sponsor-range-partner.png
+
+After copying, reference them in code as:
+- /sponsors/sponsor-company-name.png
+- /sponsors/sponsor-brand-name.png
+etc.

@@ -1,0 +1,13 @@
+PLACE YOUR SAPSA LOGO FILES HERE
+
+Copy your SAPSA logo image files into this directory.
+
+Recommended filenames:
+- sapsa-logo.png (or .svg, .jpeg)
+- sapsa-icon.png (for smaller icon version)
+- sapsa-logo-white.png (for dark backgrounds)
+
+After copying, reference them in code as:
+- /logo/sapsa-logo.png
+- /logo/sapsa-icon.png
+etc.
