@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { getNews } from "@/lib/firebase/firestore";
-import { getEvents } from "@/lib/firebase/firestore";
+import { getNews, News } from "@/lib/firebase/firestore";
+import { getEvents, Event } from "@/lib/firebase/firestore";
 import { mockNews } from "@/lib/mockData";
 import { format } from "date-fns";
 import { ArrowRight, Calendar, MapPin } from "lucide-react";
 
 export default async function HomePage() {
-  let latestNews = [];
-  let upcomingEvents = [];
+  let latestNews: News[] = [];
+  let upcomingEvents: Event[] = [];
   
   try {
     latestNews = await getNews(3);

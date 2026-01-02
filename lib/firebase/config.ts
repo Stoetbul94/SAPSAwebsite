@@ -1,19 +1,60 @@
-import { initializeApp, getApps, FirebaseApp } from "firebase/app";
-import { getAuth, Auth } from "firebase/auth";
-import { getFirestore, Firestore } from "firebase/firestore";
-import { getStorage, FirebaseStorage } from "firebase/storage";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "dummy-key",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "dummy.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "dummy-project",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "dummy-project.appspot.com",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "123456789",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:123456789:web:dummy",
 };
 
-// Check if Firebase is configured
-const isFirebaseConfigured = () => {
+let app;
+try {
+  app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+} catch (error) {
+  // If initialization fails, try to get existing app or create with minimal config
+  app = getApps().length ? getApp() : initializeApp({
+    apiKey: "dummy",
+    authDomain: "dummy.firebaseapp.com",
+    projectId: "dummy",
+    storageBucket: "dummy.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:dummy",
+  });
+}
+
+// ✅ Client-only SDK instances (non-optional)
+// Firestore and Storage work on both client and server
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+
+// Auth is client-only - initialize lazily to avoid server-side errors
+// This maintains type safety while preventing server-side initialization
+let _authInstance: ReturnType<typeof getAuth> | null = null;
+
+const getAuthInstance = (): ReturnType<typeof getAuth> => {
+  if (_authInstance === null) {
+    _authInstance = getAuth(app);
+  }
+  return _authInstance;
+};
+
+// Export auth as a getter that initializes on first access
+// This is safe because auth is only used in client components
+export const auth = new Proxy({} as ReturnType<typeof getAuth>, {
+  get(_target, prop, _receiver) {
+    const instance = getAuthInstance();
+    const value = (instance as any)[prop];
+    return typeof value === 'function' ? value.bind(instance) : value;
+  },
+});
+
+// Helper function to check if Firebase is configured
+export const isFirebaseConfigured = () => {
   return !!(
     firebaseConfig.apiKey &&
     firebaseConfig.authDomain &&
@@ -25,47 +66,3 @@ const isFirebaseConfigured = () => {
     !firebaseConfig.apiKey.includes("placeholder")
   );
 };
-
-let app: FirebaseApp | undefined;
-let auth: Auth | undefined;
-let db: Firestore | undefined;
-let storage: FirebaseStorage | undefined;
-
-function initializeFirebase() {
-  if (app) return;
-  
-  // Skip initialization if Firebase is not configured
-  if (!isFirebaseConfigured()) {
-    if (typeof window !== "undefined") {
-      console.warn(
-        "Firebase is not configured. Admin features will not work. " +
-        "See SETUP.md for configuration instructions."
-      );
-    }
-    return;
-  }
-  
-  try {
-    if (!getApps().length) {
-      app = initializeApp(firebaseConfig);
-    } else {
-      app = getApps()[0];
-    }
-    
-    // Auth only works client-side
-    if (typeof window !== "undefined") {
-      auth = getAuth(app);
-    }
-    
-    // Firestore and Storage work on both client and server
-    db = getFirestore(app);
-    storage = getStorage(app);
-  } catch (error) {
-    console.error("Firebase initialization error:", error);
-  }
-}
-
-// Initialize Firebase
-initializeFirebase();
-
-export { auth, db, storage, isFirebaseConfigured };

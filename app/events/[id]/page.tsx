@@ -4,8 +4,13 @@ import { Calendar, MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
 
 export async function generateStaticParams() {
-  const events = await getEvents(true);
-  return events.map((event) => ({ id: event.id }));
+  try {
+    const events = await getEvents(true);
+    return events.map((event) => ({ id: event.id }));
+  } catch (error) {
+    // Return empty array if Firebase is not configured during build
+    return [];
+  }
 }
 
 export default async function EventDetailPage({

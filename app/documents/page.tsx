@@ -1,9 +1,9 @@
-import { getDocuments } from "@/lib/firebase/firestore";
+import { getDocuments, Document } from "@/lib/firebase/firestore";
 import { format } from "date-fns";
 import { Download, FileText } from "lucide-react";
 
 export default async function DocumentsPage() {
-  let documents = [];
+  let documents: Document[] = [];
   
   try {
     documents = await getDocuments();

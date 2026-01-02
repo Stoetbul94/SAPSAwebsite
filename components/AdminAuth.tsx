@@ -19,11 +19,6 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (!auth) {
-      setLoading(false);
-      return;
-    }
-
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         const admin = await isAdminUser(currentUser.email || "");
@@ -69,14 +64,6 @@ export function AdminAuth({ children }: { children: React.ReactNode }) {
             See <code className="bg-gray-100 px-2 py-1 rounded">SETUP.md</code> for instructions.
           </p>
         </div>
-      </div>
-    );
-  }
-
-  if (!auth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Firebase Auth is not available.</p>
       </div>
     );
   }

@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { getNews } from "@/lib/firebase/firestore";
+import { getNews, News } from "@/lib/firebase/firestore";
 import { mockNews } from "@/lib/mockData";
 import { format } from "date-fns";
 
 export default async function NewsPage() {
-  let news = [];
+  let news: News[] = [];
   
   try {
     news = await getNews();

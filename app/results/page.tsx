@@ -1,9 +1,9 @@
-import { getResults } from "@/lib/firebase/firestore";
+import { getResults, Result } from "@/lib/firebase/firestore";
 import { format } from "date-fns";
 import { Download } from "lucide-react";
 
 export default async function ResultsPage() {
-  let results = [];
+  let results: Result[] = [];
   
   try {
     results = await getResults();

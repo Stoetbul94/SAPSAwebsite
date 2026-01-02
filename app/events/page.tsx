@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { getEvents } from "@/lib/firebase/firestore";
+import { getEvents, Event } from "@/lib/firebase/firestore";
 import { format } from "date-fns";
 import { Calendar, MapPin } from "lucide-react";
 
 export default async function EventsPage() {
-  let events = [];
+  let events: Event[] = [];
   
   try {
     events = await getEvents(true);
